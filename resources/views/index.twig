@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <!-- Meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Filmlist</title>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="assets/css/bootstrap.min.css">
+    <link rel="stylesheet" href="assets/css/app.css">
+
+    <!-- Fonts -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,900,700,400italic,600">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.1/css/font-awesome.min.css">
+
+</head>
+<body>
+
+<div class="container">
+    <h1>Filmlist
+        {% if session['user'] is null %}
+            <button class="btn btn-primary pull-right btn-top" id="login">Login</button>
+        {% else %}
+            <a href="{{ path_for('api.logout') }}">
+                <button class="btn btn-primary pull-right btn-top" style="margin-left: 5px;">Logout</button>
+            </a>
+            <button class="btn btn-primary pull-right btn-top" id="add">Add Item</button>
+        {% endif %}
+    </h1>
+    <p>Personal list containing all films I ever watched.</p>
+    <p>I totally spend <strong>1 month, 28 days, 23 hours and 29 minutes</strong> watching all films listed here... What I'm doing with my life?</p>
+    <h2>Filter and Sort:</h2>
+    <div class="form-group">
+        <label for="search">Search:</label>
+        <input type="text" id="search" class="form-control" placeholder="Search by movie name ...">
+    </div>
+    <div class="row">
+        <div class="col-md-4">
+            <div class="form-group">
+                <label for="genre">Genre:</label><br>
+                <select class="form-control" name="genre" id="genre">
+                    <option value="">No filter</option>
+                    <option value="drama">Drama</option>
+                    <option value="action">Action</option>
+                    <option value="thriller">Thriller</option>
+                </select>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="form-group">
+                <label for="type">Type:</label>
+                <select class="form-control" name="type" id="type">
+                    <option value="">No filter</option>
+                    <option value="">Movie</option>
+                    <option value="">Series</option>
+                </select>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="form-group">
+                <label for="sort">Sort after:</label>
+                <select class="form-control" name="sort" id="sort">
+                    <option value="">No sorting</option>
+                    <option value="">Year: newest first</option>
+                    <option value="">Year: newest last</option>
+                    <option value="">Runtime: longest last</option>
+                    <option value="">Runtime: longest last</option>
+                    <option value="">IMDb Rating: best first</option>
+                    <option value="">IMDb Rating: best last</option>
+                    <option value="">IMDb number of votes: highest first</option>
+                    <option value="">IMDb number of votes: highest last</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <div id="film-list">
+        <div class="film">
+            <img src="http://ia.media-imdb.com/images/M/MV5BMjEyMjcyNDI4MF5BMl5BanBnXkFtZTcwMDA5Mzg3OA@@._V1_SX300.jpg" alt="The Godfather">
+        </div>
+        <div class="film">
+            <img src="http://ia.media-imdb.com/images/M/MV5BMjIwNTYzMzE1M15BMl5BanBnXkFtZTcwOTE5Mzg3OA@@._V1_SX300.jpg" alt="The Godfather">
+        </div>
+        <div class="film">
+            <img src="http://ia.media-imdb.com/images/M/MV5BMTkxNDYxOTA4M15BMl5BanBnXkFtZTgwNTk0NzQxMTE@._V1_SX300.jpg" alt="The Godfather">
+        </div>
+        <div class="film">
+            <img src="http://ia.media-imdb.com/images/M/MV5BMTQ2NzkzMDI4OF5BMl5BanBnXkFtZTcwMDA0NzE1NA@@._V1_SX300.jpg" alt="The Godfather">
+        </div>
+    </div>
+
+</div>
+
+<!--
+<div id="loading"></div>
+-->
+
+<!-- JavaScript -->
+<script src="assets/js/jquery.min.js"></script>
+<script src="assets/js/bootstrap.min.js"></script>
+<script src="assets/js/bootbox.min.js"></script>
+<script src="assets/js/validate.min.js"></script>
+<script>
+    $(document).on("click", ".film", function(e) {
+
+        bootbox.dialog({
+            title: "The Godfather (1972)",
+            message: '' +
+            '<div class="row dialog">' +
+                '<div class="col-md-4">'+
+                    '<img src="http://ia.media-imdb.com/images/M/MV5BMjEyMjcyNDI4MF5BMl5BanBnXkFtZTcwMDA5Mzg3OA@@._V1_SX300.jpg" alt="The godfather">'+
+                '</div>'+
+                '<div class="col-md-8">'+
+                    '<i>Crime, Drama (175 min)</i>'+
+                    '<h3>Plot:</h3>'+
+                    '<p>The aging patriarch of an organized crime dynasty transfers control of his clandestine empire to his reluctant son.</p>'+
+                    '<p>IMDb rating: <i class="fa fa-star" aria-hidden="true"></i><i class="fa fa-star" aria-hidden="true"></i><i class="fa fa-star" aria-hidden="true"></i><i class="fa fa-star" aria-hidden="true"></i> ( 9.1)<br>'+
+                    'Personal rating: <i class="fa fa-star" aria-hidden="true"></i><i class="fa fa-star" aria-hidden="true"></i><i class="fa fa-star" aria-hidden="true"></i><i class="fa fa-star" aria-hidden="true"></i> (7.5)</p>'+
+                    '<p>Actors: Jesse Eisenberg, Rooney Mara, Bryan Barter, Dustin Fitzsimons</p>'+
+                '</div>'+
+            '</div>'
+        });
+
+        // Show loading button
+
+        // Get data-id from div element
+
+        // Get data per ajax request
+
+        // On complete hide loading button
+
+        // On success show box with film info
+
+    });
+
+    $(document).on("click", "#fetch", function(e) {
+
+        var button = $("#fetch");
+        button.prop('disabled', true);
+        button.html('<i class="fa fa-refresh fa-spin"></i>');
+
+        $.ajax({
+            dataType: "json",
+            url: "http://www.omdbapi.com/?i=" + $("#imdb_id").val() +"&?plot=short",
+            cache: false,
+            success: function(data) {
+
+                if (data.Response) {
+
+                    $("#imdb_id").parent().removeClass("has-error");
+
+                    $("#title").val(data.Title);
+                    $("#year").val(data.Year);
+                    $("#runtime").val(data.Runtime);
+                    $("#genres").val(data.Genre);
+                    $("#actors").val(data.Actors);
+                    $("#imdb_rating").val(data.imdbRating);
+                    $("#image_url").val(data.Poster);
+                    $("#plot").html(data.Plot);
+
+                } else {
+                    $("#imdb_id").parent().addClass("has-error");
+                }
+
+            },
+            complete: function() {
+                button.prop('disabled', false);
+                button.html('Fetch data');
+            }
+        });
+
+    });
+
+    $(document).on("click", "#add", function(e) {
+        bootbox.dialog({
+            title: "Add Item",
+            message: ''+
+            '<form>'+
+                '<div id="error"></div>'+
+                '<div class="input-group form-group">'+
+                    '<label for="imdb_id" class="sr-only">IMDb Id: *</label>'+
+                    '<input type="text" id="imdb_id" class="form-control" placeholder="Enter IMDb Id to fetch data...">'+
+                    '<span class="input-group-btn">'+
+                        '<button class="btn btn-default" type="button" id="fetch">Fetch data</button>'+
+                    '</span>'+
+                '</div>'+
+                '<div class="form-group">'+
+                    '<label for="title_german">German title (if necessary):</label>'+
+                    '<input type="text" id="title_german" class="form-control">'+
+                '</div>'+
+                '<div class="form-group">'+
+                    '<label for="title">Title: *</label>'+
+                    '<input type="text" id="title" class="form-control">'+
+                '</div>'+
+                '<div class="row">'+
+                    '<div class="col-md-6">'+
+                        '<div class="form-group">'+
+                            '<label for="year">Year: *</label>'+
+                            '<input type="text" id="year" class="form-control">'+
+                        '</div>'+
+                    '</div>'+
+                    '<div class="col-md-6">'+
+                        '<div class="form-group">'+
+                            '<label for="runtime">Runtime: *</label>'+
+                            '<input type="text" id="runtime" class="form-control">'+
+                        '</div>'+
+                    '</div>'+
+                '</div>'+
+                '<div class="form-group">'+
+                    '<label for="genres">Genres: *</label>'+
+                    '<input type="text" id="genres" class="form-control">'+
+                '</div>'+
+                '<div class="form-group">'+
+                    '<label for="actors">Actors: *</label>'+
+                    '<input type="text" id="actors" class="form-control">'+
+                '</div>'+
+                '<div class="row">'+
+                    '<div class="col-md-6">'+
+                        '<div class="form-group">'+
+                            '<label for="imdb_rating">IMDb rating: *</label>'+
+                            '<input type="text" id="imdb_rating" class="form-control">'+
+                        '</div>'+
+                    '</div>'+
+                    '<div class="col-md-6">'+
+                        '<div class="form-group">'+
+                            '<label for="personal_rating">Personal rating:</label>'+
+                            '<input type="text" id="personal_rating" class="form-control">'+
+                        '</div>'+
+                    '</div>'+
+                '</div>'+
+                '<input type="hidden" id="image_url">'+
+                '<label for="plot">Plot: *</label>'+
+                '<textarea id="plot" class="form-control"></textarea>'+
+            '</form>',
+            buttons: {
+                success: {
+                    label: "Add item",
+                    className: "btn-success",
+                    callback: function() {
+
+                        var response;
+
+                        var errorContainer = $("#error");
+                        var button = $(".btn-success");
+                        button.html('<i class="fa fa-refresh fa-spin"></i>');
+                        button.prop('disabled', true);
+
+                        $.ajax({
+                            type: "POST",
+                            dataType: "json",
+                            async: false,
+                            url: "{{ path_for('api.addItem') }}",
+                            cache: false,
+                            data: {
+                                imdb_id: $("#imdb_id").val(),
+                                title_german: $("#title_german").val(),
+                                title: $("#title").val(),
+                                year: $("#year").val(),
+                                runtime: $("#runtime").val(),
+                                genres: $("#genres").val(),
+                                actors: $("#actors").val(),
+                                imdb_rating: $("#imdb_rating").val(),
+                                personal_rating: $("#personal_rating").val(),
+                                image_url: $("#image_url").val(),
+                                plot: $("#plot").val(),
+                            },
+                            success: function(data) {
+                                response = data;
+                            },
+                            complete: function() {
+                                button.prop('disabled', false);
+                                button.html('Add item');
+                            }
+                        });
+
+                        if (response.error) {
+                            errorContainer.addClass("alert alert-danger");
+                            errorContainer.html(response.error_messages[0]);
+                            return false;
+                        } else {
+                            window.location.replace("{{ path_for('home') }}");
+                            return true;
+                        }
+
+                    }
+                }
+            }
+        });
+    });
+
+    $(document).on("click", "#login", function(e) {
+        bootbox.dialog({
+            title: "Login",
+            message: ''+
+            '<form>'+
+                '<div class="form-group">'+
+                    '<label for="username">Username:</label>'+
+                    '<input type="text" class="form-control" id="username">'+
+                    '<span class="form-error"></span>'+
+                '</div>'+
+                '<div class="form-group">'+
+                    '<label for="password">Password:</label>'+
+                    '<input type="password" class="form-control" id="password">'+
+                    '<span class="form-error"></span>'+
+                '</div>'+
+            '</form>',
+            buttons: {
+                success: {
+                    label: "Login",
+                    className: "btn-success",
+                    callback: function() {
+
+                        var response;
+
+                        var button = $(".btn-success");
+                        button.html('<i class="fa fa-refresh fa-spin"></i>');
+                        button.prop('disabled', true);
+
+                        $.ajax({
+                            type: "POST",
+                            dataType: "json",
+                            async: false,
+                            url: "{{ path_for('api.login') }}",
+                            cache: false,
+                            data: {
+                                username: $("#username").val(),
+                                password: $("#password").val()
+                            },
+                            success: function(data) {
+                                response = data;
+                            },
+                            complete: function() {
+                                button.prop('disabled', false);
+                                button.html('Login');
+                            }
+                        });
+
+                        if (response.error) {
+                            $("#username").parent().find(".form-error").html(response.error_messages[0]);
+                            return false;
+                        } else {
+                            window.location.replace("{{ path_for('home') }}");
+                            return true;
+                        }
+
+                    }
+                }
+            }
+        });
+    });
+</script>
+
+</body>
+</html>

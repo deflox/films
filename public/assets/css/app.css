@@ -1,0 +1,50 @@
+/* General */
+body {
+    font-family: 'Source Sans Pro', sans-serif;
+}
+body h1{
+    font-size: 65px;
+    font-weight: 700;
+}
+body p {
+    font-size: 18px;
+}
+.form-error {
+    color: #c0392b;
+}
+
+/* Content */
+.container .btn-top {
+    margin-top: 20px;
+}
+.container #film-list {
+    margin-top: 50px;
+}
+.container #film-list .film {
+    display: inline-block;
+    cursor: pointer;
+}
+.container #film-list .film img {
+    width: 168px;
+}
+.dialog img {
+    width: 185px;
+}
+.dialog h3 {
+    margin-top: 10px;
+}
+.dialog p {
+    font-size: 16px;
+}
+#plot {
+    max-width: 100%;
+    height: 150px;
+}
+#loading {
+    background: url("../images/loading.gif") no-repeat;
+    position: fixed;
+    right: 20px;
+    bottom: 20px;
+    width: 120px;
+    height: 120px;
+}
