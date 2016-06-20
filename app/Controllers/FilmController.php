@@ -1,8 +1,13 @@
 <?php
 
+/**
+ * Controller for handling all requests regarding
+ * films.
+ *
+ * @author Leo Rudin
+ */
 
 namespace App\Controllers;
-
 
 use App\Accessor;
 use App\Models\Movie;
@@ -11,11 +16,25 @@ use App\Models\Genre;
 
 class FilmController extends Accessor
 {
+    /**
+     * Get request for displaying the index page.
+     *
+     * @param  $req
+     * @param  $res
+     * @return mixed
+     */
     public function getIndex($req, $res)
     {
         return $this->view->render($res, 'index.twig');
     }
 
+    /**
+     * Post request for storing a new item.
+     *
+     * @param  $req
+     * @param  $res
+     * @return string
+     */
     public function storeItem($req, $res)
     {
         $json = [
@@ -55,9 +74,20 @@ class FilmController extends Accessor
                 ->get()
                 ->first();
 
-            if (isset($dbGenre)) {
+            if (!isset($dbGenre)) {
 
-                
+                // Create a new genre
+                $newGenre = new Genre();
+                $newGenre->name = $genre;
+                $newGenre->save();
+
+                // Create relation
+                $movie->genres()->save($newGenre);
+
+            } else {
+
+                // Create relation
+                $movie->genres()->save($dbGenre);
 
             }
 
@@ -65,6 +95,44 @@ class FilmController extends Accessor
 
         // Actors
         $allActors = explode(',', $req->getParam('actors'));
+
+        foreach ($allActors as $actorName) {
+
+            $dbActor = Actor::where('name', trim($actorName))
+                ->get()
+                ->first();
+
+            if (!isset($dbActor)) {
+
+                // Create a new actor
+                $newActor = new Actor();
+                $newActor->name = $actorName;
+                $newActor->save();
+
+                // Create relation
+                $movie->actors()->save($newActor);
+
+            } else {
+
+                // Crate relation
+                $movie->actors()->save($dbActor);
+
+            }
+
+        }
+
+        return json_encode($json);
+
+    }
+
+    /**
+     * Post request for deleting a film.
+     *
+     * @param $req
+     * @param $res
+     */
+    public function deleteFilm($req, $res)
+    {
 
     }
 }

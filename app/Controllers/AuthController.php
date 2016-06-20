@@ -1,13 +1,25 @@
 <?php
 
+/**
+ * Controller for handling all authentication
+ * requests. 
+ * 
+ * @author Leo Rudin
+ */
 
 namespace App\Controllers;
-
 
 use App\Accessor;
 
 class AuthController extends Accessor
 {
+    /**
+     * Post request for login. 
+     * 
+     * @param  $req
+     * @param  $res
+     * @return string
+     */
     public function postLogin($req, $res)
     {
         $json = [
@@ -26,6 +38,13 @@ class AuthController extends Accessor
         return json_encode($json);
     }
 
+    /**
+     * Get request for logout. 
+     * 
+     * @param  $req
+     * @param  $res
+     * @return mixed
+     */
     public function getLogout($req, $res)
     {
         unset($_SESSION['user']);
