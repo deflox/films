@@ -67,12 +67,10 @@
                     <option value="">No sorting</option>
                     <option value="">Year: newest first</option>
                     <option value="">Year: newest last</option>
-                    <option value="">Runtime: longest last</option>
+                    <option value="">Runtime: longest first</option>
                     <option value="">Runtime: longest last</option>
                     <option value="">IMDb Rating: best first</option>
                     <option value="">IMDb Rating: best last</option>
-                    <option value="">IMDb number of votes: highest first</option>
-                    <option value="">IMDb number of votes: highest last</option>
                 </select>
             </div>
         </div>
@@ -155,7 +153,7 @@
 
                     $("#title").val(data.Title);
                     $("#year").val(data.Year);
-                    $("#runtime").val(data.Runtime);
+                    $("#runtime").val(data.Runtime.slice(0, -1));
                     $("#genres").val(data.Genre);
                     $("#actors").val(data.Actors);
                     $("#imdb_rating").val(data.imdbRating);
@@ -205,7 +203,7 @@
                     '</div>'+
                     '<div class="col-md-6">'+
                         '<div class="form-group">'+
-                            '<label for="runtime">Runtime: *</label>'+
+                            '<label for="runtime">Runtime (min): *</label>'+
                             '<input type="text" id="runtime" class="form-control">'+
                         '</div>'+
                     '</div>'+
@@ -246,6 +244,7 @@
 
                         var errorContainer = $("#error");
                         var button = $(".btn-success");
+
                         button.html('<i class="fa fa-refresh fa-spin"></i>');
                         button.prop('disabled', true);
 
@@ -253,7 +252,7 @@
                             type: "POST",
                             dataType: "json",
                             async: false,
-                            url: "{{ path_for('api.addItem') }}",
+                            url: "{{ path_for('api.add.item') }}",
                             cache: false,
                             data: {
                                 imdb_id: $("#imdb_id").val(),
@@ -266,7 +265,7 @@
                                 imdb_rating: $("#imdb_rating").val(),
                                 personal_rating: $("#personal_rating").val(),
                                 image_url: $("#image_url").val(),
-                                plot: $("#plot").val(),
+                                plot: $("#plot").val()
                             },
                             success: function(data) {
                                 response = data;
@@ -277,6 +276,9 @@
                             }
                         });
 
+                        console.log(response);
+
+                        /*
                         if (response.error) {
                             errorContainer.addClass("alert alert-danger");
                             errorContainer.html(response.error_messages[0]);
@@ -285,6 +287,7 @@
                             window.location.replace("{{ path_for('home') }}");
                             return true;
                         }
+                        */
 
                     }
                 }

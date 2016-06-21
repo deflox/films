@@ -35,24 +35,34 @@ class FilmController extends Accessor
      * @param  $res
      * @return string
      */
-    public function storeItem($req, $res)
+    public function addItem($req, $res)
     {
         $json = [
             'error' => false,
             'error_messages' => []
         ];
 
-        if (empty($req->getParam('imdb_id')) ||
-            empty($req->getParam('title')) ||
-            empty($req->getParam('year')) ||
-            empty($req->getParam('runtime')) ||
-            empty($req->getParam('genres')) ||
-            empty($req->getParam('actors')) ||
-            empty($req->getParam('imdb_rating')) ||
-            empty($req->getParam('plot'))) {
+        // Validate input
+        $validator = $this->validator->validate($req, [
+            'imdb_id|IMDb Id' => ['required'],
+            'title|title' => ['required'],
+            'year|year' => ['required', 'integer', ['length', 4]],
+            'runtime|runtime' => ['required', 'integer'],
+            'genres|genres' => ['required'],
+            'actors|actors' => ['required'],
+            'imdb_rating|IMDb rating' => ['required'],
+            'plot|plot' => ['required']
+        ]);
+
+        if ($validator->failed()) {
+            
             $json['error'] = true;
-            array_push($json['error_messages'], "Please fill out all required fields.");
+            $json['error_messages'] = $validator->errors();
+            return json_encode($json);
+
         }
+
+        // TODO: Check if item already exists
 
         // Movie
         $movie = new Movie();
@@ -61,7 +71,8 @@ class FilmController extends Accessor
         $movie->title_german = $req->getParam('title_german');
         $movie->imdb_rating = $req->getParam('imdb_rating');
         $movie->personal_rating = $req->getParam('title');
-        $movie->runtime = trim(substr($req->getParam('runtime'), -3));
+        //$movie->runtime = trim(substr($req->getParam('runtime'), -3));
+        $movie->runtime = $req->getParam('runtime');
         $movie->plot = $req->getParam('plot');
         $movie->save();
 
@@ -131,7 +142,7 @@ class FilmController extends Accessor
      * @param $req
      * @param $res
      */
-    public function deleteFilm($req, $res)
+    public function deleteItem($req, $res)
     {
 
     }

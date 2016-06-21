@@ -57,6 +57,9 @@ $container['view'] = function($c) {
 
     return $view;
 };
+$container['validator'] = function($c) {
+    return new \App\Libraries\Validator();
+};
 
 /*
  * Local libraries
