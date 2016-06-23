@@ -42,27 +42,36 @@ class FilmController extends Accessor
             'error_messages' => []
         ];
 
+        // Check if item already exists
+        $dbMovie = Movie::where('imdb_id', $req->getParam('imdb_id'))
+            ->get()
+            ->first();
+
+        if ($dbMovie !== null) {
+            $json['error'] = true;
+            $json['error_messages']['global'] = [
+                'There exists already an entry with that IMDb-Id.'
+            ];
+            return json_encode($json);
+        }
+
         // Validate input
         $validator = $this->validator->validate($req, [
             'imdb_id|IMDb Id' => ['required'],
-            'title|title' => ['required'],
-            'year|year' => ['required', 'integer', ['length', 4]],
-            'runtime|runtime' => ['required', 'integer'],
-            'genres|genres' => ['required'],
-            'actors|actors' => ['required'],
+            'title|Title' => ['required'],
+            'year|Year' => ['required', 'integer', ['length', 4]],
+            'runtime|Runtime' => ['required', 'integer'],
+            'genres|Genres' => ['required'],
+            'actors|Actors' => ['required'],
             'imdb_rating|IMDb rating' => ['required'],
-            'plot|plot' => ['required']
+            'plot|Plot' => ['required']
         ]);
 
         if ($validator->failed()) {
-            
             $json['error'] = true;
             $json['error_messages'] = $validator->errors();
             return json_encode($json);
-
         }
-
-        // TODO: Check if item already exists
 
         // Movie
         $movie = new Movie();
@@ -71,7 +80,6 @@ class FilmController extends Accessor
         $movie->title_german = $req->getParam('title_german');
         $movie->imdb_rating = $req->getParam('imdb_rating');
         $movie->personal_rating = $req->getParam('title');
-        //$movie->runtime = trim(substr($req->getParam('runtime'), -3));
         $movie->runtime = $req->getParam('runtime');
         $movie->plot = $req->getParam('plot');
         $movie->save();

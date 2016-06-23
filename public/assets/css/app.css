@@ -12,6 +12,38 @@ body p {
 .form-error {
     color: #c0392b;
 }
+.form-field-error {
+    color: #c0392b;
+}
+.form-field-error-imdb-id {
+    margin-top: -15px;
+    margin-bottom: 10px;
+}
+
+#ohsnap {
+    position: fixed;
+    bottom: 5px;
+    right:5px;
+    margin-left: 5px;
+    z-index:99;
+}
+.alert {
+    text-align: right;
+    margin-top: 10px;
+    margin-right: 20px;
+    padding: 15px;
+    border: 1px solid #eed3d7;
+    border-radius: 4px;
+    float: right;
+    clear: right;
+    background-color: white;
+    font-size: 20px;
+}
+.alert-green {
+    color: white;
+    background-color: #27ae60;
+}
+
 
 /* Content */
 .container .btn-top {

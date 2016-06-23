@@ -97,12 +97,16 @@
 <div id="loading"></div>
 -->
 
+<div id="ohsnap"></div>
+
 <!-- JavaScript -->
 <script src="assets/js/jquery.min.js"></script>
 <script src="assets/js/bootstrap.min.js"></script>
 <script src="assets/js/bootbox.min.js"></script>
 <script src="assets/js/validate.min.js"></script>
+<script src="assets/js/ohsnap.min.js"></script>
 <script>
+
     $(document).on("click", ".film", function(e) {
 
         bootbox.dialog({
@@ -153,7 +157,7 @@
 
                     $("#title").val(data.Title);
                     $("#year").val(data.Year);
-                    $("#runtime").val(data.Runtime.slice(0, -1));
+                    $("#runtime").val(data.Runtime.slice(0, -4));
                     $("#genres").val(data.Genre);
                     $("#actors").val(data.Actors);
                     $("#imdb_rating").val(data.imdbRating);
@@ -178,7 +182,7 @@
             title: "Add Item",
             message: ''+
             '<form>'+
-                '<div id="error"></div>'+
+                '<div id="form-global-error"></div>'+
                 '<div class="input-group form-group">'+
                     '<label for="imdb_id" class="sr-only">IMDb Id: *</label>'+
                     '<input type="text" id="imdb_id" class="form-control" placeholder="Enter IMDb Id to fetch data...">'+
@@ -186,53 +190,65 @@
                         '<button class="btn btn-default" type="button" id="fetch">Fetch data</button>'+
                     '</span>'+
                 '</div>'+
+                '<div class="form-field-error" id="form-field-error-imdb-id"></div>'+
                 '<div class="form-group">'+
-                    '<label for="title_german">German title (if necessary):</label>'+
+                    '<label for="title_german">Title in foreign language (if necessary):</label>'+
                     '<input type="text" id="title_german" class="form-control">'+
+                    '<div class="form-field-error"></div>'+
                 '</div>'+
                 '<div class="form-group">'+
                     '<label for="title">Title: *</label>'+
                     '<input type="text" id="title" class="form-control">'+
+                    '<div class="form-field-error"></div>'+
                 '</div>'+
                 '<div class="row">'+
                     '<div class="col-md-6">'+
                         '<div class="form-group">'+
                             '<label for="year">Year: *</label>'+
                             '<input type="text" id="year" class="form-control">'+
+                            '<div class="form-field-error"></div>'+
                         '</div>'+
                     '</div>'+
                     '<div class="col-md-6">'+
                         '<div class="form-group">'+
                             '<label for="runtime">Runtime (min): *</label>'+
                             '<input type="text" id="runtime" class="form-control">'+
+                            '<div class="form-field-error"></div>'+
                         '</div>'+
                     '</div>'+
                 '</div>'+
                 '<div class="form-group">'+
                     '<label for="genres">Genres: *</label>'+
                     '<input type="text" id="genres" class="form-control">'+
+                    '<div class="form-field-error"></div>'+
                 '</div>'+
                 '<div class="form-group">'+
                     '<label for="actors">Actors: *</label>'+
                     '<input type="text" id="actors" class="form-control">'+
+                    '<div class="form-field-error"></div>'+
                 '</div>'+
                 '<div class="row">'+
                     '<div class="col-md-6">'+
                         '<div class="form-group">'+
                             '<label for="imdb_rating">IMDb rating: *</label>'+
                             '<input type="text" id="imdb_rating" class="form-control">'+
+                            '<div class="form-field-error"></div>'+
                         '</div>'+
                     '</div>'+
                     '<div class="col-md-6">'+
                         '<div class="form-group">'+
                             '<label for="personal_rating">Personal rating:</label>'+
                             '<input type="text" id="personal_rating" class="form-control">'+
+                            '<div class="form-field-error"></div>'+
                         '</div>'+
                     '</div>'+
                 '</div>'+
+                '<div class="form-group">'+
+                    '<label for="plot">Plot: *</label>'+
+                    '<textarea id="plot" class="form-control"></textarea>'+
+                    '<div class="form-field-error"></div>'+
+                '</div>'+
                 '<input type="hidden" id="image_url">'+
-                '<label for="plot">Plot: *</label>'+
-                '<textarea id="plot" class="form-control"></textarea>'+
             '</form>',
             buttons: {
                 success: {
@@ -242,11 +258,14 @@
 
                         var response;
 
-                        var errorContainer = $("#error");
+                        var globalErrorContainer = $("#form-global-error");
+                        var imdbIdError = $("#form-field-error-imdb-id");
                         var button = $(".btn-success");
 
                         button.html('<i class="fa fa-refresh fa-spin"></i>');
                         button.prop('disabled', true);
+
+                        var fields = ["imdb_id","title_german","title","year","runtime","genres","actors","imdb_rating","personal_rating","plot"];
 
                         $.ajax({
                             type: "POST",
@@ -278,16 +297,42 @@
 
                         console.log(response);
 
-                        /*
                         if (response.error) {
-                            errorContainer.addClass("alert alert-danger");
-                            errorContainer.html(response.error_messages[0]);
+
+                            for (var i=0; i < fields.length; i++) {
+                                if (fields[i] == "imdb_id") {
+                                    if ("imdb_id" in response.error_messages) {
+                                        imdbIdError.addClass("form-field-error-imdb-id");
+                                        imdbIdError.html(response.error_messages["imdb_id"][0]);
+                                    } else {
+                                        imdbIdError.html("");
+                                        imdbIdError.removeClass("form-field-error-imdb-id");
+                                    }
+                                } else {
+                                    if (fields[i] in response.error_messages) {
+                                        $("#"+fields[i]).parent().find(".form-field-error").html(response.error_messages[fields[i]][0]);
+                                    } else {
+                                        $("#"+fields[i]).parent().find(".form-field-error").html("");
+                                    }
+                                }
+                            }
+
+                            if ("global" in response.error_messages) {
+                                globalErrorContainer.addClass("alert alert-danger");
+                                globalErrorContainer.html(response.error_messages["global"][0]);
+                            } else {
+                                globalErrorContainer.removeClass("alert alert-danger");
+                                globalErrorContainer.html("");
+                            }
+
                             return false;
+
                         } else {
-                            window.location.replace("{{ path_for('home') }}");
+
+                            ohSnap('Added successfully!', {color: 'green'});
                             return true;
+
                         }
-                        */
 
                     }
                 }
