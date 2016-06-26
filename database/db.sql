@@ -13,13 +13,13 @@ ENGINE = InnoDB;
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `films`.`movies` (
   `id` INT NOT NULL AUTO_INCREMENT,
-  `imdb_id` VARCHAR(45) NULL,
-  `name` VARCHAR(255) NOT NULL,
-  `name_german` VARCHAR(255) NULL,
+  `imdb_id` VARCHAR(45) NOT NULL,
+  `title` VARCHAR(255) NOT NULL,
+  `title_foreign_language` VARCHAR(255) NULL,
   `imdb_rating` DECIMAL(2,1) NOT NULL,
   `personal_rating` DECIMAL(2,1) NULL,
+  `image_url` VARCHAR(255) NULL,
   `runtime` INT NOT NULL,
-  `type` VARCHAR(45) NOT NULL,
   `plot` MEDIUMTEXT NOT NULL,
   `created_at` TIMESTAMP NULL,
   `updated_at` TIMESTAMP NULL,
@@ -62,16 +62,14 @@ CREATE TABLE IF NOT EXISTS `films`.`users` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `username` VARCHAR(45) NOT NULL,
   `password` VARCHAR(255) NOT NULL,
-  `created_at` TIMESTAMP NULL,
-  `updated_at` TIMESTAMP NULL,
   PRIMARY KEY (`id`))
 ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `films`.`attemps`
+-- Table `films`.`attempts`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `films`.`attemps` (
+CREATE TABLE IF NOT EXISTS `films`.`attempts` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `ip_address` VARCHAR(255) NOT NULL,
   `count` TINYINT NOT NULL,
@@ -79,4 +77,4 @@ CREATE TABLE IF NOT EXISTS `films`.`attemps` (
   PRIMARY KEY (`id`))
 ENGINE = InnoDB;
 
-INSERT INTO `films`.`users` (`id`, `username`, `password`, `created_at`, `updated_at`) VALUES (1, 'test', '$2y$10$zGCLkCfqgyt5mlDGOAxN.OFsjmMCMRPtQOysn4Gj2Mhk/zG33IBDu', NULL, NULL);
+INSERT INTO `films`.`users` (`id`, `username`, `password`) VALUES (1, 'test', '$2y$10$zGCLkCfqgyt5mlDGOAxN.OFsjmMCMRPtQOysn4Gj2Mhk/zG33IBDu');

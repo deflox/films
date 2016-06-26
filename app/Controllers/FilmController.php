@@ -25,7 +25,28 @@ class FilmController extends Accessor
      */
     public function getIndex($req, $res)
     {
-        return $this->view->render($res, 'index.twig');
+        return $this->view->render($res, 'index.twig', [
+            'movies' => Movie::orderBy('created_at', 'desc')
+                ->get()
+        ]);
+    }
+
+    /**
+     * Post request for getting a single item.
+     *
+     * @param  $req
+     * @param  $res
+     * @return \App\Models\Movie
+     */
+    public function getSingleItem($req, $res)
+    {
+        $movie = Movie::find($req->getParam('id'));
+
+        return json_encode([
+            'movie' => $movie,
+            'actors' => $movie->actors()->get(),
+            'genres' => $movie->genres()->get()
+        ]);
     }
 
     /**
@@ -58,13 +79,15 @@ class FilmController extends Accessor
         // Validate input
         $validator = $this->validator->validate($req, [
             'imdb_id|IMDb Id' => ['required'],
-            'title|Title' => ['required'],
+            'title|Title' => ['required', ['lengthMax', 255]],
+            'title_foreign_language|Title in foreign language' => [['lengthMax', 255]],
             'year|Year' => ['required', 'integer', ['length', 4]],
             'runtime|Runtime' => ['required', 'integer'],
             'genres|Genres' => ['required'],
             'actors|Actors' => ['required'],
-            'imdb_rating|IMDb rating' => ['required'],
-            'plot|Plot' => ['required']
+            'imdb_rating|IMDb rating' => ['required', 'numeric'],
+            'personal_rating|Personal rating' => ['numeric'],
+            'plot|Plot' => ['required', ['lengthMax', 1000]]
         ]);
 
         if ($validator->failed()) {
@@ -73,13 +96,17 @@ class FilmController extends Accessor
             return json_encode($json);
         }
 
+        // Save image
+        $url = $this->saveImage($req->getParam('imdb_id'), $req->getParam('image_url'));
+
         // Movie
         $movie = new Movie();
         $movie->imdb_id = $req->getParam('imdb_id');
         $movie->title = $req->getParam('title');
-        $movie->title_german = $req->getParam('title_german');
+        $movie->title_foreign_language = $req->getParam('title_foreign_language');
         $movie->imdb_rating = $req->getParam('imdb_rating');
-        $movie->personal_rating = $req->getParam('title');
+        $movie->personal_rating = $req->getParam('personal_rating');
+        $movie->image_url = $url;
         $movie->runtime = $req->getParam('runtime');
         $movie->plot = $req->getParam('plot');
         $movie->save();
@@ -87,9 +114,9 @@ class FilmController extends Accessor
         // Genres
         $allGenres = explode(',', $req->getParam('genres'));
 
-        foreach ($allGenres as $genre) {
+        foreach ($allGenres as $genreName) {
 
-            $dbGenre = Genre::where('name', trim($genre))
+            $dbGenre = Genre::where('name', trim($genreName))
                 ->get()
                 ->first();
 
@@ -97,7 +124,7 @@ class FilmController extends Accessor
 
                 // Create a new genre
                 $newGenre = new Genre();
-                $newGenre->name = $genre;
+                $newGenre->name = trim($genreName);
                 $newGenre->save();
 
                 // Create relation
@@ -125,7 +152,7 @@ class FilmController extends Accessor
 
                 // Create a new actor
                 $newActor = new Actor();
-                $newActor->name = $actorName;
+                $newActor->name = trim($actorName);
                 $newActor->save();
 
                 // Create relation
@@ -153,5 +180,39 @@ class FilmController extends Accessor
     public function deleteItem($req, $res)
     {
 
+    }
+
+    /**
+     * Saves an image to the local file system.
+     *
+     * @param  $id
+     * @param  $url
+     * @return string
+     */
+    public function saveImage($id, $url)
+    {
+        if (ini_get('allow_url_fopen')) {
+
+            file_put_contents(__DIR__.'/../../public/assets/images/uploads/'.$id.'.jpg', file_get_contents($url));
+
+            return '';
+
+        } else if (function_exists('curl_version')) {
+
+            $ch = curl_init($url);
+            $fp = fopen(__DIR__.'/../../public/assets/images/uploads/'.$id.'.jpg', 'wb');
+            curl_setopt($ch, CURLOPT_FILE, $fp);
+            curl_setopt($ch, CURLOPT_HEADER, 0);
+            curl_exec($ch);
+            curl_close($ch);
+            fclose($fp);
+
+            return '';
+
+        } else {
+
+            return $url;
+
+        }
     }
 }

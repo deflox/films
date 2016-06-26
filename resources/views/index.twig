@@ -77,25 +77,20 @@
     </div>
 
     <div id="film-list">
-        <div class="film">
-            <img src="http://ia.media-imdb.com/images/M/MV5BMjEyMjcyNDI4MF5BMl5BanBnXkFtZTcwMDA5Mzg3OA@@._V1_SX300.jpg" alt="The Godfather">
-        </div>
-        <div class="film">
-            <img src="http://ia.media-imdb.com/images/M/MV5BMjIwNTYzMzE1M15BMl5BanBnXkFtZTcwOTE5Mzg3OA@@._V1_SX300.jpg" alt="The Godfather">
-        </div>
-        <div class="film">
-            <img src="http://ia.media-imdb.com/images/M/MV5BMTkxNDYxOTA4M15BMl5BanBnXkFtZTgwNTk0NzQxMTE@._V1_SX300.jpg" alt="The Godfather">
-        </div>
-        <div class="film">
-            <img src="http://ia.media-imdb.com/images/M/MV5BMTQ2NzkzMDI4OF5BMl5BanBnXkFtZTcwMDA0NzE1NA@@._V1_SX300.jpg" alt="The Godfather">
-        </div>
+        {% if (movies is not empty) %}
+            {% for movie in movies %}
+            <div class="film" data-id="{{ movie.id }}">
+                <img src="assets/images/uploads/{{ movie.imdb_id }}.jpg" alt="{{ movie.title }}">
+            </div>
+            {% endfor %}
+        {% else %}
+            <p>No movies yet. Add a movie with the <strong>Add item</strong> button.</p>
+        {% endif %}
     </div>
 
 </div>
 
-<!--
 <div id="loading"></div>
--->
 
 <div id="ohsnap"></div>
 
@@ -109,39 +104,80 @@
 
     $(document).on("click", ".film", function(e) {
 
+        var response;
+        var image_url = "";
+        var genres = "";
+        var actors = "";
+        var imdb_rating = "";
+        var personal_rating = "";
+
+        var id = $(this).attr("data-id");
+
+        $("#loading").css("display", "block");
+
+        $.ajax({
+            type: "POST",
+            dataType: "json",
+            async: false,
+            url: "{{ path_for('api.get.item') }}",
+            cache: false,
+            data: {
+                id: id
+            },
+            success: function(data) {
+                response = data;
+            },
+            complete: function() {
+                $("#loading").css("display", "none");
+            }
+        });
+
+        console.log(response);
+
+        // Actors
+        for (var i=0; i < response.actors.length; i++) {
+            actors = actors + " " + response.actors[i].name + ",";
+        }
+
+        // Genres
+        for (var z=0; z < response.genres.length; z++) {
+            genres = genres + " " + response.genres[z].name + ",";
+        }
+
+        // Image path
+        if (response.movie.image_url == "") {
+            image_url = "assets/images/uploads/" + response.movie.imdb_id + ".jpg";
+        } else {
+            image_url = response.movie.image_url;
+        }
+
+        // Ratings
+        var starsCountIMDbRating = response.movie.imdb_rating.slice(0, -2);
+
         bootbox.dialog({
-            title: "The Godfather (1972)",
+            title: "" + response.movie.title + " (" + response.movie.year + ")",
             message: '' +
             '<div class="row dialog">' +
                 '<div class="col-md-4">'+
-                    '<img src="http://ia.media-imdb.com/images/M/MV5BMjEyMjcyNDI4MF5BMl5BanBnXkFtZTcwMDA5Mzg3OA@@._V1_SX300.jpg" alt="The godfather">'+
+                    '<img src="'+ image_url +'" alt="' + response.movie.title + '">'+
                 '</div>'+
                 '<div class="col-md-8">'+
-                    '<i>Crime, Drama (175 min)</i>'+
+                    '<i>' + genres.slice(0, -1) + ' (' + response.movie.runtime + ' min)</i>'+
                     '<h3>Plot:</h3>'+
-                    '<p>The aging patriarch of an organized crime dynasty transfers control of his clandestine empire to his reluctant son.</p>'+
+                    '<p>' + response.movie.plot + '</p>'+
                     '<p>IMDb rating: <i class="fa fa-star" aria-hidden="true"></i><i class="fa fa-star" aria-hidden="true"></i><i class="fa fa-star" aria-hidden="true"></i><i class="fa fa-star" aria-hidden="true"></i> ( 9.1)<br>'+
                     'Personal rating: <i class="fa fa-star" aria-hidden="true"></i><i class="fa fa-star" aria-hidden="true"></i><i class="fa fa-star" aria-hidden="true"></i><i class="fa fa-star" aria-hidden="true"></i> (7.5)</p>'+
-                    '<p>Actors: Jesse Eisenberg, Rooney Mara, Bryan Barter, Dustin Fitzsimons</p>'+
+                    '<p>Actors: ' + actors.slice(0, -1) + '</p>'+
                 '</div>'+
             '</div>'
         });
-
-        // Show loading button
-
-        // Get data-id from div element
-
-        // Get data per ajax request
-
-        // On complete hide loading button
-
-        // On success show box with film info
 
     });
 
     $(document).on("click", "#fetch", function(e) {
 
         var button = $("#fetch");
+
         button.prop('disabled', true);
         button.html('<i class="fa fa-refresh fa-spin"></i>');
 
@@ -192,8 +228,8 @@
                 '</div>'+
                 '<div class="form-field-error" id="form-field-error-imdb-id"></div>'+
                 '<div class="form-group">'+
-                    '<label for="title_german">Title in foreign language (if necessary):</label>'+
-                    '<input type="text" id="title_german" class="form-control">'+
+                    '<label for="title_foreign_language">Title in foreign language (if necessary):</label>'+
+                    '<input type="text" id="title_foreign_language" class="form-control">'+
                     '<div class="form-field-error"></div>'+
                 '</div>'+
                 '<div class="form-group">'+
@@ -218,12 +254,12 @@
                     '</div>'+
                 '</div>'+
                 '<div class="form-group">'+
-                    '<label for="genres">Genres: *</label>'+
+                    '<label for="genres">Genres (separated by comma): *</label>'+
                     '<input type="text" id="genres" class="form-control">'+
                     '<div class="form-field-error"></div>'+
                 '</div>'+
                 '<div class="form-group">'+
-                    '<label for="actors">Actors: *</label>'+
+                    '<label for="actors">Actors (separated by commma): *</label>'+
                     '<input type="text" id="actors" class="form-control">'+
                     '<div class="form-field-error"></div>'+
                 '</div>'+
@@ -265,7 +301,7 @@
                         button.html('<i class="fa fa-refresh fa-spin"></i>');
                         button.prop('disabled', true);
 
-                        var fields = ["imdb_id","title_german","title","year","runtime","genres","actors","imdb_rating","personal_rating","plot"];
+                        var fields = ["imdb_id","title_foreign_language","title","year","runtime","genres","actors","imdb_rating","personal_rating","plot"];
 
                         $.ajax({
                             type: "POST",
@@ -275,7 +311,7 @@
                             cache: false,
                             data: {
                                 imdb_id: $("#imdb_id").val(),
-                                title_german: $("#title_german").val(),
+                                title_foreign_language: $("#title_foreign_language").val(),
                                 title: $("#title").val(),
                                 year: $("#year").val(),
                                 runtime: $("#runtime").val(),
@@ -365,6 +401,7 @@
                         var response;
 
                         var button = $(".btn-success");
+
                         button.html('<i class="fa fa-refresh fa-spin"></i>');
                         button.prop('disabled', true);
 

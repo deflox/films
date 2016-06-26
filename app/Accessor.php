@@ -1,8 +1,13 @@
 <?php
 
+/**
+ * Class for managing access to the slim 
+ * container.
+ * 
+ * @author Leo Rudin
+ */
 
 namespace App;
-
 
 class Accessor
 {
