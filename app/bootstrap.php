@@ -77,6 +77,9 @@ $container['AuthController'] = function($c) {
 $container['FilmController'] = function($c) {
     return new App\Controllers\FilmController($c);
 };
+$container['StatisticsController'] = function($c) {
+    return new App\Controllers\StatisticsController($c);
+};
 
 /*
  * Middleware

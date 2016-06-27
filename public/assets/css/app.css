@@ -43,7 +43,9 @@ body p {
     color: white;
     background-color: #27ae60;
 }
-
+.view-input {
+    width: 525px;
+}
 
 /* Content */
 .container .btn-top {

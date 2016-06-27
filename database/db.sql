@@ -20,6 +20,7 @@ CREATE TABLE IF NOT EXISTS `films`.`movies` (
   `personal_rating` DECIMAL(2,1) NULL,
   `image_url` VARCHAR(255) NULL,
   `runtime` INT NOT NULL,
+  `year` INT NOT NULL,
   `plot` MEDIUMTEXT NOT NULL,
   `created_at` TIMESTAMP NULL,
   `updated_at` TIMESTAMP NULL,

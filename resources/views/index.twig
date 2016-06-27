@@ -132,8 +132,6 @@
             }
         });
 
-        console.log(response);
-
         // Actors
         for (var i=0; i < response.actors.length; i++) {
             actors = actors + " " + response.actors[i].name + ",";
@@ -151,8 +149,23 @@
             image_url = response.movie.image_url;
         }
 
-        // Ratings
-        var starsCountIMDbRating = response.movie.imdb_rating.slice(0, -2);
+        // IMDb rating
+        var htmlIMDbRating = "";
+        for (var i=0; i < Math.floor(parseFloat(response.movie.imdb_rating)); i++) {
+            htmlIMDbRating += '<i class="fa fa-star" aria-hidden="true"></i>';
+        }
+        htmlIMDbRating += " (" + response.movie.imdb_rating + ")";
+
+        // Personal rating
+        var htmlPersonalRating = "";
+        if (response.movie.personal_rating > 0) {
+            for (var i=0; i < Math.floor(parseFloat(response.movie.personal_rating)); i++) {
+                htmlPersonalRating += '<i class="fa fa-star" aria-hidden="true"></i>';
+            }
+            htmlPersonalRating += " (" + response.movie.personal_rating + ")";
+        } else {
+            htmlPersonalRating = "--";
+        }
 
         bootbox.dialog({
             title: "" + response.movie.title + " (" + response.movie.year + ")",
@@ -165,11 +178,51 @@
                     '<i>' + genres.slice(0, -1) + ' (' + response.movie.runtime + ' min)</i>'+
                     '<h3>Plot:</h3>'+
                     '<p>' + response.movie.plot + '</p>'+
-                    '<p>IMDb rating: <i class="fa fa-star" aria-hidden="true"></i><i class="fa fa-star" aria-hidden="true"></i><i class="fa fa-star" aria-hidden="true"></i><i class="fa fa-star" aria-hidden="true"></i> ( 9.1)<br>'+
-                    'Personal rating: <i class="fa fa-star" aria-hidden="true"></i><i class="fa fa-star" aria-hidden="true"></i><i class="fa fa-star" aria-hidden="true"></i><i class="fa fa-star" aria-hidden="true"></i> (7.5)</p>'+
+                    '<p>IMDb rating: ' + htmlIMDbRating + '<br>'+
+                    'Personal rating: ' + htmlPersonalRating + '</p>'+
                     '<p>Actors: ' + actors.slice(0, -1) + '</p>'+
                 '</div>'+
-            '</div>'
+            '</div>',
+            buttons: {
+                danger: {
+                    label: "Delete",
+                    className: "btn-danger",
+                    callback: function() {
+                        bootbox.confirm("<h3>Are you sure?</h3>", function(result) {
+                            if (result) {
+                                return true;
+                            } else {
+                                return false;
+                            }
+                        });
+                    }
+                },
+                success: {
+                    label: "Add view date",
+                    className: "btn-success",
+                    callback: function() {
+                        bootbox.dialog({
+                            title: "Add view date to <strong>" + response.movie.title + "</strong>",
+                            message: '' +
+                            '<p style="font-size: 15px;">With this tool you can track the dates you watched this movie.</p>' +
+                            '<div class="row">' +
+                                '<div class="col-md-10">' +
+                                    '<div class="form-group">' +
+                                        '<input type="text" value="2007-05-03" disabled="disabled" class="form-control view-input">' +
+                                    '</div>' +
+                                '</div>' +
+                                '<div class="col-md-2 text-right">' +
+                                    '<button class="btn btn-danger"><i class="fa fa-trash" aria-hidden="true"></i></button>' +
+                                '</div>' +
+                            '</div>' +
+                            '<div class="clearfix">' +
+                                '<button class="btn btn-success pull-right">Add view</button>' +
+                            '</div>'
+                        });
+                        return false;
+                    }
+                }
+            }
         });
 
     });

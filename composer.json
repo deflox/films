@@ -5,7 +5,8 @@
         "slim/twig-view": "^2.1",
         "illuminate/database": "^5.2",
         "akrabat/rka-ip-address-middleware": "^0.4.0",
-        "vlucas/valitron": "^1.2"
+        "vlucas/valitron": "^1.2",
+        "slim/csrf": "^0.7.0"
     },
     "autoload": {
         "psr-4": {

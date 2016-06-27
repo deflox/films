@@ -108,6 +108,7 @@ class FilmController extends Accessor
         $movie->personal_rating = $req->getParam('personal_rating');
         $movie->image_url = $url;
         $movie->runtime = $req->getParam('runtime');
+        $movie->year = $req->getParam('year');
         $movie->plot = $req->getParam('plot');
         $movie->save();
 
@@ -174,12 +175,25 @@ class FilmController extends Accessor
     /**
      * Post request for deleting a film.
      *
-     * @param $req
-     * @param $res
+     * @param  $req
+     * @param  $res
+     * @return string
      */
     public function deleteItem($req, $res)
     {
+        $json = [
+            'error' => false,
+            'error_messages' => []
+        ];
 
+        if (Movie::destroy($req->getParam('id')) !== 1) {
+            $json['error'] = true;
+            $json['error_description']['global'] = [
+                'We could not delete the desired item. Please try again later.'
+            ];
+        }
+
+        return json_encode($json);
     }
 
     /**
