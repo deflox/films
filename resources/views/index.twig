@@ -80,7 +80,7 @@
         {% if (movies is not empty) %}
             {% for movie in movies %}
             <div class="film" data-id="{{ movie.id }}">
-                <img src="assets/images/uploads/{{ movie.imdb_id }}.jpg" alt="{{ movie.title }}">
+                <img src="{{ movie.image_url is empty ? "assets/images/uploads/#{movie.imdb_id}.jpg" : movie.image_url }}" alt="{{ movie.title }}">
             </div>
             {% endfor %}
         {% else %}
@@ -101,6 +101,10 @@
 <script src="assets/js/validate.min.js"></script>
 <script src="assets/js/ohsnap.min.js"></script>
 <script>
+
+    function writeErrors() {
+
+    }
 
     $(document).on("click", ".film", function(e) {
 
@@ -190,11 +194,11 @@
                     callback: function() {
                         bootbox.confirm("<h3>Are you sure?</h3>", function(result) {
                             if (result) {
-                                return true;
-                            } else {
-                                return false;
+                                // delete
+                                bootbox.hideAll();
                             }
                         });
+                        return false;
                     }
                 },
                 success: {
@@ -204,14 +208,24 @@
                         bootbox.dialog({
                             title: "Add view date to <strong>" + response.movie.title + "</strong>",
                             message: '' +
-                            '<p style="font-size: 15px;">With this tool you can track the dates you watched this movie.</p>' +
+                            '<p style="font-size: 15px; padding-bottom: 10px;">With this tool you can track the dates you watched this movie.</p>' +
                             '<div class="row">' +
-                                '<div class="col-md-10">' +
+                                '<div class="col-md-10 views-negative-margin">' +
                                     '<div class="form-group">' +
-                                        '<input type="text" value="2007-05-03" disabled="disabled" class="form-control view-input">' +
+                                        '<input type="text" value="2007-05-03" readonly="readonly" class="form-control view-input">' +
                                     '</div>' +
                                 '</div>' +
-                                '<div class="col-md-2 text-right">' +
+                                '<div class="col-md-2 text-right views-negative-margin">' +
+                                    '<button class="btn btn-danger"><i class="fa fa-trash" aria-hidden="true"></i></button>' +
+                                '</div>' +
+                            '</div>' +
+                            '<div class="row">' +
+                                '<div class="col-md-10 views-negative-margin">' +
+                                    '<div class="form-group">' +
+                                        '<input type="text" value="2007-05-03" readonly="readonly" class="form-control view-input">' +
+                                    '</div>' +
+                                '</div>' +
+                                '<div class="col-md-2 text-right views-negative-margin">' +
                                     '<button class="btn btn-danger"><i class="fa fa-trash" aria-hidden="true"></i></button>' +
                                 '</div>' +
                             '</div>' +
@@ -437,12 +451,12 @@
                 '<div class="form-group">'+
                     '<label for="username">Username:</label>'+
                     '<input type="text" class="form-control" id="username">'+
-                    '<span class="form-error"></span>'+
+                    '<span class="form-field-error"></span>'+
                 '</div>'+
                 '<div class="form-group">'+
                     '<label for="password">Password:</label>'+
                     '<input type="password" class="form-control" id="password">'+
-                    '<span class="form-error"></span>'+
+                    '<span class="form-field-error"></span>'+
                 '</div>'+
             '</form>',
             buttons: {

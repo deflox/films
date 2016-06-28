@@ -57,15 +57,15 @@ $container['view'] = function($c) {
 
     return $view;
 };
-$container['validator'] = function($c) {
-    return new \App\Libraries\Validator();
-};
 
 /*
  * Local libraries
  */
 $container['auth'] = function($c) {
     return new App\Libraries\Auth($c);
+};
+$container['validator'] = function($c) {
+    return new \App\Libraries\Validator($c);
 };
 
 /*

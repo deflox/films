@@ -27,7 +27,7 @@ body p {
     margin-left: 5px;
     z-index:99;
 }
-.alert {
+.ohsnap-alert {
     text-align: right;
     margin-top: 10px;
     margin-right: 20px;
@@ -45,6 +45,9 @@ body p {
 }
 .view-input {
     width: 525px;
+}
+.views-negative-margin {
+    margin-top: -10px;
 }
 
 /* Content */
