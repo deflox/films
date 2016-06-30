@@ -18,10 +18,10 @@ CREATE TABLE IF NOT EXISTS `films`.`movies` (
   `title_foreign_language` VARCHAR(255) NULL,
   `imdb_rating` DECIMAL(2,1) NOT NULL,
   `personal_rating` DECIMAL(2,1) NULL,
-  `image_url` VARCHAR(255) NULL,
-  `runtime` INT NOT NULL,
   `year` INT NOT NULL,
+  `runtime` INT NOT NULL,
   `plot` MEDIUMTEXT NOT NULL,
+  `image_url` VARCHAR(255) NULL,
   `created_at` TIMESTAMP NULL,
   `updated_at` TIMESTAMP NULL,
   PRIMARY KEY (`id`))
@@ -77,5 +77,17 @@ CREATE TABLE IF NOT EXISTS `films`.`attempts` (
   `lock_time` TIMESTAMP NULL,
   PRIMARY KEY (`id`))
 ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `films`.`views`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `films`.`views` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `movie_id` VARCHAR(45) NOT NULL,
+  `view_date` VARCHAR(45) NOT NULL,
+  PRIMARY KEY (`id`))
+ENGINE = InnoDB;
+
 
 INSERT INTO `films`.`users` (`id`, `username`, `password`) VALUES (1, 'test', '$2y$10$zGCLkCfqgyt5mlDGOAxN.OFsjmMCMRPtQOysn4Gj2Mhk/zG33IBDu');

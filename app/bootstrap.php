@@ -2,6 +2,8 @@
 
 session_start();
 
+date_default_timezone_set('Europe/Zurich');
+
 require __DIR__ . '/../vendor/autoload.php';
 
 /*
@@ -79,6 +81,9 @@ $container['FilmController'] = function($c) {
 };
 $container['StatisticsController'] = function($c) {
     return new App\Controllers\StatisticsController($c);
+};
+$container['ViewController'] = function($c) {
+    return new App\Controllers\ViewController($c);
 };
 
 /*

@@ -31,7 +31,7 @@
             <button class="btn btn-primary pull-right btn-top" id="add">Add Item</button>
         {% endif %}
     </h1>
-    <p>Personal list containing all films I ever watched.</p>
+    <p>Personal list containing all films I've ever watched.</p>
     <p>I totally spend <strong>1 month, 28 days, 23 hours and 29 minutes</strong> watching all films listed here... What I'm doing with my life?</p>
     <h2>Filter and Sort:</h2>
     <div class="form-group">
@@ -102,7 +102,7 @@
 <script src="assets/js/ohsnap.min.js"></script>
 <script>
 
-    function writeErrors() {
+    function writeErrorsInForm() {
 
     }
 
@@ -112,8 +112,6 @@
         var image_url = "";
         var genres = "";
         var actors = "";
-        var imdb_rating = "";
-        var personal_rating = "";
 
         var id = $(this).attr("data-id");
 
@@ -202,40 +200,85 @@
                     }
                 },
                 success: {
-                    label: "Add view date",
+                    label: "Manage views",
                     className: "btn-success",
                     callback: function() {
-                        bootbox.dialog({
-                            title: "Add view date to <strong>" + response.movie.title + "</strong>",
-                            message: '' +
-                            '<p style="font-size: 15px; padding-bottom: 10px;">With this tool you can track the dates you watched this movie.</p>' +
-                            '<div class="row">' +
-                                '<div class="col-md-10 views-negative-margin">' +
-                                    '<div class="form-group">' +
-                                        '<input type="text" value="2007-05-03" readonly="readonly" class="form-control view-input">' +
-                                    '</div>' +
-                                '</div>' +
-                                '<div class="col-md-2 text-right views-negative-margin">' +
-                                    '<button class="btn btn-danger"><i class="fa fa-trash" aria-hidden="true"></i></button>' +
-                                '</div>' +
-                            '</div>' +
-                            '<div class="row">' +
-                                '<div class="col-md-10 views-negative-margin">' +
-                                    '<div class="form-group">' +
-                                        '<input type="text" value="2007-05-03" readonly="readonly" class="form-control view-input">' +
-                                    '</div>' +
-                                '</div>' +
-                                '<div class="col-md-2 text-right views-negative-margin">' +
-                                    '<button class="btn btn-danger"><i class="fa fa-trash" aria-hidden="true"></i></button>' +
-                                '</div>' +
-                            '</div>' +
-                            '<div class="clearfix">' +
-                                '<button class="btn btn-success pull-right">Add view</button>' +
-                            '</div>'
+
+                        $.ajax({
+                            type: "GET",
+                            dataType: "json",
+                            cache: false,
+                            url: "api/views/movie/" + response.movie.id,
+                            success: function(data) {
+
+                                var htmlMovieViews = '<p style="font-size: 15px; ">With this tool you can track the dates you watched this movie.</p><div id="movie-views">';
+
+                                if (data.length != 0) {
+                                    for (var i=0; i < data.length; i++) {
+                                        htmlMovieViews += '' +
+                                        '<div class="row">' +
+                                            '<div class="col-md-10">' +
+                                                '<input type="text" value="' + data[i].view_date + '" readonly="readonly" class="form-control view-input views-positive-margin">' +
+                                            '</div>' +
+                                            '<div class="col-md-2 text-right views-positive-margin">' +
+                                                '<button class="btn btn-danger" data-id="' + data[i].id + '">' +
+                                                    '<i class="fa fa-trash" aria-hidden="true"></i>' +
+                                                '</button>' +
+                                            '</div>' +
+                                        '</div>';
+                                    }
+                                } else {
+                                    htmlMovieViews += "There are no views registered for this movie.";
+                                }
+
+                                htmlMovieViews += '</div><div class="clearfix"><button class="btn btn-success pull-right" id="add-movie-view" data-id="' + response.movie.id + '">Add view</button></div>';
+
+                                bootbox.dialog({
+                                    title: "Manages views for <strong>" + response.movie.title + "</strong>",
+                                    message: htmlMovieViews
+                                });
+                            }
                         });
+
                         return false;
                     }
                 }
+            }
+        });
+
+    });
+
+    $(document).on("click", "#add-movie-view", function(e) {
+
+        bootbox.dialog({
+            title: "Add view date",
+            message: '' +
+            '<div class="form-group">'+
+                '<label for="viewDate">View date:</label>'+
+                '<input type="text" class="form-control" id="viewDate" placeholder="DD/MM/YYYY">'+
+                '<span class="form-input-error"></span>'+
+            '</div>'+
+            '<div class="clearfix">'+
+                '<button class="btn btn-success pull-right" data-id="' + $(this).attr('data-id') + '" id="add-movie-view-action">Add</button>'+
+            '</div>'
+        });
+
+    });
+
+    $(document).on("click", "#add-movie-view-action", function(e) {
+
+        $.ajax({
+            type: "POST",
+            dataType: "json",
+            url: "{{ path_for('api.views.add') }}",
+            cache: false,
+            data: {
+                movie_id: $(this).attr('data-id'),
+                viewDate: $("#viewDate").val()
+            },
+            success: function(data) {
+                // asdf
+                console.log(data);
             }
         });
 
@@ -305,17 +348,24 @@
                     '<div class="form-field-error"></div>'+
                 '</div>'+
                 '<div class="row">'+
-                    '<div class="col-md-6">'+
+                    '<div class="col-md-4">'+
                         '<div class="form-group">'+
                             '<label for="year">Year: *</label>'+
                             '<input type="text" id="year" class="form-control">'+
                             '<div class="form-field-error"></div>'+
                         '</div>'+
                     '</div>'+
-                    '<div class="col-md-6">'+
+                    '<div class="col-md-4">'+
                         '<div class="form-group">'+
                             '<label for="runtime">Runtime (min): *</label>'+
                             '<input type="text" id="runtime" class="form-control">'+
+                            '<div class="form-field-error"></div>'+
+                        '</div>'+
+                    '</div>'+
+                    '<div class="col-md-4">'+
+                        '<div class="form-group">'+
+                            '<label for="movieViewDate">First view date:</label>'+
+                            '<input type="text" id="movieViewDate" class="form-control" placeholder="DD/MM/YYYY">'+
                             '<div class="form-field-error"></div>'+
                         '</div>'+
                     '</div>'+
@@ -368,7 +418,7 @@
                         button.html('<i class="fa fa-refresh fa-spin"></i>');
                         button.prop('disabled', true);
 
-                        var fields = ["imdb_id","title_foreign_language","title","year","runtime","genres","actors","imdb_rating","personal_rating","plot"];
+                        var fields = ["imdb_id","title_foreign_language","title", "year","movieViewDate","runtime","genres","actors","imdb_rating","personal_rating","plot"];
 
                         $.ajax({
                             type: "POST",
@@ -382,6 +432,7 @@
                                 title: $("#title").val(),
                                 year: $("#year").val(),
                                 runtime: $("#runtime").val(),
+                                movieViewDate: $("#movieViewDate").val(),
                                 genres: $("#genres").val(),
                                 actors: $("#actors").val(),
                                 imdb_rating: $("#imdb_rating").val(),
@@ -397,8 +448,6 @@
                                 button.html('Add item');
                             }
                         });
-
-                        console.log(response);
 
                         if (response.error) {
 

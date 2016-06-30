@@ -13,6 +13,8 @@ use App\Accessor;
 use App\Models\Movie;
 use App\Models\Actor;
 use App\Models\Genre;
+use App\Models\View;
+use DateTime;
 
 class FilmController extends Accessor
 {
@@ -83,6 +85,7 @@ class FilmController extends Accessor
             'title_foreign_language|Title in foreign language' => [['lengthMax', 255]],
             'year|Year' => ['required', 'integer', ['length', 4]],
             'runtime|Runtime' => ['required', 'integer'],
+            'movieViewDate|Movie view date' => [['dateFormat', 'd/m/Y']],
             'genres|Genres' => ['required'],
             'actors|Actors' => ['required'],
             'imdb_rating|IMDb rating' => ['required', 'numeric'],
@@ -166,6 +169,14 @@ class FilmController extends Accessor
 
             }
 
+        }
+
+        // Create movie view date if necessary
+        if (!empty($req->getParam('movieViewDate'))) {
+            View::create([
+                'view_date' => date('Y-m-d H:i:s', DateTime::createFromFormat('d/m/Y H:i:s', $req->getParam('movieViewDate'). '00:00:00')->getTimestamp()),
+                'movie_id' => $movie->id
+            ]);
         }
 
         return json_encode($json);

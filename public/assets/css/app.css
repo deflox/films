@@ -46,8 +46,8 @@ body p {
 .view-input {
     width: 525px;
 }
-.views-negative-margin {
-    margin-top: -10px;
+.views-positive-margin {
+    margin-bottom: 10px;
 }
 
 /* Content */
