@@ -12,5 +12,6 @@ $app->post('/api/get/item', 'FilmController:getSingleItem')->setName('api.get.it
 
 $app->get('/api/views/movie/{id}', 'ViewController:getMovieViews')->setName('api.views.movie');
 $app->post('/api/views/add', 'ViewController:addMovieView')->setName('api.views.add');
+$app->get('/api/views/delete/{id}', 'ViewController:deleteMovieView')->setName('api.views.delete');
 
 $app->get('/api/statistics/total/time', 'StatisticsController:getTotalTimeString')->setName('api.statistics.total.time');

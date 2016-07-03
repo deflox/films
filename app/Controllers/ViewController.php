@@ -57,10 +57,37 @@ class ViewController extends Accessor
             return json_encode($json);
         }
 
-        View::create([
-            'view_date' => date('Y-m-d H:i:s', DateTime::createFromFormat('d/m/Y H:i:s', $req->getParam('viewDate'). '00:00:00')->getTimestamp()),
+        $timestamp = date('Y-m-d H:i:s', DateTime::createFromFormat('d/m/Y H:i:s', $req->getParam('viewDate'). '00:00:00')->getTimestamp());
+
+        $view = View::create([
+            'view_date' => $timestamp,
             'movie_id' => $req->getParam('movie_id')
         ]);
+
+        return json_encode($view);
+    }
+
+    /**
+     * Get request for deleting an movie view.
+     *
+     * @param  $req
+     * @param  $res
+     * @param  $args
+     * @return string
+     */
+    public function deleteMovieView($req, $res, $args)
+    {
+        $json = [
+            'error' => false,
+            'error_messages' => []
+        ];
+
+        if (View::destroy($args['id']) !== 1) {
+            $json['error'] = true;
+            $json['error_message']['global'] = [
+                'We could not delete the desired item. Please try again later.'
+            ];
+        }
 
         return json_encode($json);
     }

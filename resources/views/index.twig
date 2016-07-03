@@ -43,7 +43,7 @@
             <div class="form-group">
                 <label for="genre">Genre:</label><br>
                 <select class="form-control" name="genre" id="genre">
-                    <option value="">No filter</option>
+                    <option value="no_filter">No filter</option>
                     <option value="drama">Drama</option>
                     <option value="action">Action</option>
                     <option value="thriller">Thriller</option>
@@ -213,6 +213,22 @@
 
                                 var htmlMovieViews = '<p style="font-size: 15px; ">With this tool you can track the dates you watched this movie.</p><div id="movie-views">';
 
+                                htmlMovieViews += '' +
+                                '<div class="row">' +
+                                    '<div class="col-md-10">' +
+                                        '<label for="viewDate" class="sr-only">View date:</label>' +
+                                        '<input type="text" class="form-control view-input views-positive-margin" id="viewDate" placeholder="DD/MMM/YYYY">' +
+                                        '<span class="form-field-error"></span>' +
+                                    '</div>' +
+                                    '<div class="col-md-2 text-right views-positive-margin">' +
+                                        '<button class="btn btn-default" id="add-movie-view" data-id="' + response.movie.id + '">' +
+                                            '<i class="fa fa-plus" aria-hidden="true"></i>' +
+                                        '</button>' +
+                                    '</div>' +
+                                '</div>';
+
+                                htmlMovieViews += '<div id="movie-views">';
+
                                 if (data.length != 0) {
                                     for (var i=0; i < data.length; i++) {
                                         htmlMovieViews += '' +
@@ -221,7 +237,7 @@
                                                 '<input type="text" value="' + data[i].view_date + '" readonly="readonly" class="form-control view-input views-positive-margin">' +
                                             '</div>' +
                                             '<div class="col-md-2 text-right views-positive-margin">' +
-                                                '<button class="btn btn-danger" data-id="' + data[i].id + '">' +
+                                                '<button class="btn btn-danger delete-view" data-id="' + data[i].id + '">' +
                                                     '<i class="fa fa-trash" aria-hidden="true"></i>' +
                                                 '</button>' +
                                             '</div>' +
@@ -231,10 +247,10 @@
                                     htmlMovieViews += "There are no views registered for this movie.";
                                 }
 
-                                htmlMovieViews += '</div><div class="clearfix"><button class="btn btn-success pull-right" id="add-movie-view" data-id="' + response.movie.id + '">Add view</button></div>';
+                                htmlMovieViews += '</div>';
 
                                 bootbox.dialog({
-                                    title: "Manages views for <strong>" + response.movie.title + "</strong>",
+                                    title: "Manage views for <strong>" + response.movie.title + "</strong>",
                                     message: htmlMovieViews
                                 });
                             }
@@ -250,23 +266,6 @@
 
     $(document).on("click", "#add-movie-view", function(e) {
 
-        bootbox.dialog({
-            title: "Add view date",
-            message: '' +
-            '<div class="form-group">'+
-                '<label for="viewDate">View date:</label>'+
-                '<input type="text" class="form-control" id="viewDate" placeholder="DD/MM/YYYY">'+
-                '<span class="form-input-error"></span>'+
-            '</div>'+
-            '<div class="clearfix">'+
-                '<button class="btn btn-success pull-right" data-id="' + $(this).attr('data-id') + '" id="add-movie-view-action">Add</button>'+
-            '</div>'
-        });
-
-    });
-
-    $(document).on("click", "#add-movie-view-action", function(e) {
-
         $.ajax({
             type: "POST",
             dataType: "json",
@@ -276,9 +275,55 @@
                 movie_id: $(this).attr('data-id'),
                 viewDate: $("#viewDate").val()
             },
-            success: function(data) {
-                // asdf
-                console.log(data);
+            success: function(response) {
+
+                if ("error" in response && response.error == true) {
+
+                    $("#viewDate").parent().find(".form-field-error").html(response.error_messages.viewDate[0]);
+
+                } else {
+
+                    $("#movie-views").append('' +
+                    '<div class="row">' +
+                        '<div class="col-md-10">' +
+                            '<input type="text" value="' + response.view_date + '" readonly="readonly" class="form-control view-input views-positive-margin">' +
+                        '</div>' +
+                        '<div class="col-md-2 text-right views-positive-margin">' +
+                            '<button class="btn btn-danger" data-id="' + response.id + '">' +
+                                '<i class="fa fa-trash" aria-hidden="true"></i>' +
+                            '</button>' +
+                        '</div>' +
+                    '</div>'
+                    );
+
+                }
+
+            }
+        });
+
+    });
+
+    $(document).on("click", ".delete-view", function(e) {
+
+        var parentElement = $(this).parent().parent();
+
+        $.ajax({
+            type: "GET",
+            dataType: "json",
+            url: "api/views/delete/" + $(this).attr('data-id'),
+            cache: false,
+            success: function(response) {
+
+                if ("errors" in response && response.error == true) {
+
+                    window.alert(response.error_messages.global[0]);
+
+                } else {
+
+                    parentElement.remove();
+
+                }
+
             }
         });
 
